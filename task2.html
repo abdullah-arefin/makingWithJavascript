@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch</title>
+</head>
+
+<body>
+  <main class="stopwatch">
+    <h1>Stopwatch</h1>
+    <div id="time" class="time-display" aria-live="polite">0</div>
+
+    <div class="button-group">
+      <button id="startButton" type="button">Start</button>
+      <button id="stopButton" type="button">Stop</button>
+      <button id="resetButton" type="button">Reset</button>
+    </div>
+  </main>
+
+  <style>
+    :root {
+      font-family: Arial, sans-serif;
+      color: #17202a;
+      background: #f4f7f9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .stopwatch {
+      width: min(100%, 480px);
+      padding: 40px 24px;
+      text-align: center;
+      background: #ffffff;
+      border: 1px solid #d5dde3;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgb(23 32 42 / 10%);
+    }
+
+    h1 {
+      margin: 0 0 24px;
+      font-size: 2rem;
+    }
+
+    .time-display {
+      margin-bottom: 32px;
+      font-family: "Courier New", monospace;
+      font-size: clamp(4rem, 18vw, 6rem);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    button {
+      min-width: 100px;
+      padding: 12px 20px;
+      border: 2px solid #1f5f8b;
+      border-radius: 8px;
+      color: #ffffff;
+      background: #1f5f8b;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      background: #17496b;
+      transform: translateY(-2px);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #f2a900;
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      border-color: #9da8b0;
+      color: #5f6b73;
+      background: #dce1e5;
+      cursor: not-allowed;
+      opacity: 0.75;
+    }
+
+    @media (max-width: 360px) {
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+
+  <script>
+    const STEP = 3;
+    const MAX_TIME = 30;
+
+    let currentTime = 0;
+    let intervalId = null;
+
+    const timeDisplay = document.getElementById("time");
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const resetButton = document.getElementById("resetButton");
+
+    function updateDisplay() {
+      timeDisplay.textContent = currentTime;
+      startButton.disabled = intervalId !== null || currentTime >= MAX_TIME;
+      stopButton.disabled = intervalId === null;
+    }
+
+    function startTimer() {
+      if (intervalId !== null || currentTime >= MAX_TIME) {
+        return;
+      }
+
+      intervalId = setInterval(function () {
+        currentTime = Math.min(currentTime + STEP, MAX_TIME);
+        updateDisplay();
+
+        if (currentTime >= MAX_TIME) {
+          stopTimer();
+        }
+      }, 1000);
+
+      updateDisplay();
+    }
+
+    function stopTimer() {
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+
+      updateDisplay();
+    }
+
+    function resetTimer() {
+      stopTimer();
+      currentTime = 0;
+      updateDisplay();
+    }
+
+    startButton.addEventListener("click", startTimer);
+    stopButton.addEventListener("click", stopTimer);
+    resetButton.addEventListener("click", resetTimer);
+
+    updateDisplay();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortune Generator</title>
+
+    <!-- All four themes use Google Fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Josefin+Sans:wght@400;600&family=Merriweather:wght@400;700&family=Raleway:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* The variables below are changed by applyTheme() in the script. */
+        :root {
+            --page-bg: #0F0E47;
+            --box-bg: #8686AC;
+            --border-color: #505081;
+            --text-color: #0F0E47;
+            --header-text: #8686AC;
+            --fortune-font: "Inter", sans-serif;
+            --fortune-size: 20px;
+            --button-text: #0F0E47;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--page-bg);
+            color: var(--header-text);
+            font-family: Arial, sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        header,
+        footer {
+            text-align: center;
+            padding: 1.25rem;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 5vw, 2.4rem);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .fortune-layout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .theme-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .theme-button {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 3px solid var(--swatch-border);
+            border-radius: 8px;
+            background: var(--swatch-bg);
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Each button keeps its own theme color instead of sharing the active theme color. */
+        #theme-button-0 {
+            --swatch-bg: #8686AC;
+            --swatch-border: #0F0E47;
+        }
+
+        #theme-button-1 {
+            --swatch-bg: #68BA7F;
+            --swatch-border: #253D2C;
+        }
+
+        #theme-button-2 {
+            --swatch-bg: #CD1C18;
+            --swatch-border: #38000A;
+        }
+
+        #theme-button-3 {
+            --swatch-bg: #ADEBB3;
+            --swatch-border: #6B403C;
+        }
+
+        .theme-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 0 3px var(--header-text);
+        }
+
+        .theme-button:focus-visible {
+            outline: 3px solid var(--header-text);
+            outline-offset: 3px;
+        }
+
+        .theme-button[aria-pressed="true"] {
+            box-shadow: 0 0 0 3px var(--header-text);
+        }
+
+        .fortune-box {
+            width: min(100%, 560px);
+            min-height: 190px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border: 4px solid var(--border-color);
+            border-radius: 18px;
+            background: var(--box-bg);
+            color: var(--text-color);
+            text-align: center;
+            transition: background-color 0.4s ease, border-color 0.4s ease,
+                color 0.4s ease;
+        }
+
+        #fortune-text {
+            margin: 0;
+            font-family: var(--fortune-font);
+            font-size: var(--fortune-size);
+            font-weight: 600;
+            line-height: 1.5;
+            transition: font-family 0.4s ease, font-size 0.4s ease;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* mobile */
+        @media (max-width: 600px) {
+            main {
+                padding: 1.5rem 1rem;
+            }
+
+            .fortune-layout {
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+
+            .theme-buttons {
+                flex-direction: row;
+            }
+
+            .fortune-box {
+                order: -1;
+                min-height: 170px;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Fortune Generator</h1>
+    </header>
+
+    <main>
+        <div class="fortune-layout">
+            <div class="theme-buttons" aria-label="Themes on the left">
+                <button id="theme-button-0" class="theme-button" type="button" title="Blue Eclipse theme"
+                    aria-label="Blue Eclipse theme" aria-pressed="true"></button>
+                <button id="theme-button-1" class="theme-button" type="button" title="Lush Forest theme"
+                    aria-label="Lush Forest theme" aria-pressed="false"></button>
+            </div>
+
+            <section class="fortune-box" aria-live="polite" aria-label="Your fortune">
+                <p id="fortune-text"></p>
+            </section>
+
+            <div class="theme-buttons" aria-label="Themes on the right">
+                <button id="theme-button-2" class="theme-button" type="button" title="Chili Spice theme"
+                    aria-label="Chili Spice theme" aria-pressed="false"></button>
+                <button id="theme-button-3" class="theme-button" type="button" title="Lotus Garden theme"
+                    aria-label="Lotus Garden theme" aria-pressed="false"></button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Made by Abdullah</p>
+    </footer>
+
+    <script>
+        // Each object contains every value needed to apply one complete theme.
+        const themes = [
+            {
+                name: "Blue Eclipse",
+                pageBg: "#0F0E47",
+                boxBg: "#8686AC",
+                border: "#505081",
+                textColor: "#0F0E47",
+                headerText: "#8686AC",
+                fontFamily: '"Inter", sans-serif',
+                fontSize: "20px",
+                buttonBg: "#8686AC",
+                buttonBorder: "#505081",
+                buttonText: "#0F0E47"
+            },
+            {
+                name: "Lush Forest",
+                pageBg: "#253D2C",
+                boxBg: "#CFFFDC",
+                border: "#68BA7F",
+                textColor: "#253D2C",
+                headerText: "#CFFFDC",
+                fontFamily: '"Josefin Sans", sans-serif',
+                fontSize: "22px",
+                buttonBg: "#CFFFDC",
+                buttonBorder: "#68BA7F",
+                buttonText: "#253D2C"
+            },
+            {
+                name: "Chili Spice",
+                pageBg: "#38000A",
+                boxBg: "#FFA896",
+                border: "#9B1313",
+                textColor: "#38000A",
+                headerText: "#FFA896",
+                fontFamily: '"Raleway", sans-serif',
+                fontSize: "24px",
+                buttonBg: "#FFA896",
+                buttonBorder: "#9B1313",
+                buttonText: "#38000A"
+            },
+            {
+                name: "Lotus Garden",
+                pageBg: "#6B403C",
+                boxBg: "#ADEBB3",
+                border: "#FF857A",
+                textColor: "#6B403C",
+                headerText: "#ADEBB3",
+                fontFamily: '"Merriweather", serif',
+                fontSize: "26px",
+                buttonBg: "#ADEBB3",
+                buttonBorder: "#FF857A",
+                buttonText: "#6B403C"
+            }
+        ];
+
+        const fortunes = [
+            "A small step today will open a bright door tomorrow.",
+            "Your patience is quietly creating something wonderful.",
+            "Trust your instincts; they know more than you think.",
+            "A kind word from you will make a lasting difference.",
+            "Good things are growing, even when you cannot see them yet.",
+            "The path ahead becomes clearer with every brave choice.",
+            "Your creativity will turn an ordinary moment into something special.",
+            "Rest is not a detour; it is part of the journey.",
+            "An unexpected opportunity will bring fresh energy your way.",
+            "You already have the wisdom needed for your next chapter.",
+            "Joy is closer than it appears when you look for the little things.",
+            "Your steady effort will soon be noticed and rewarded."
+        ];
+
+        const fortuneText = document.getElementById("fortune-text");
+        const themeButtons = document.querySelectorAll(".theme-button");
+
+        // Apply every visual part of a theme in one place.
+        function applyTheme(index) {
+            const theme = themes[index];
+            const root = document.documentElement;
+
+            root.style.setProperty("--page-bg", theme.pageBg);
+            root.style.setProperty("--box-bg", theme.boxBg);
+            root.style.setProperty("--border-color", theme.border);
+            root.style.setProperty("--text-color", theme.textColor);
+            root.style.setProperty("--header-text", theme.headerText);
+            root.style.setProperty("--fortune-font", theme.fontFamily);
+            root.style.setProperty("--fortune-size", theme.fontSize);
+            themeButtons.forEach(function (button, buttonIndex) {
+                button.setAttribute("aria-pressed", buttonIndex === index);
+            });
+        }
+
+        // Pick a new fortune whenever the page loads.
+        const randomIndex = Math.floor(Math.random() * fortunes.length);
+        fortuneText.textContent = fortunes[randomIndex];
+
+        // Theme 1 is the default, and every button uses the same function.
+        applyTheme(0);
+        themeButtons.forEach(function (button, index) {
+            button.addEventListener("click", function () {
+                applyTheme(index);
+            });
+        });
+    </script>
+</body>
+
+</html>
